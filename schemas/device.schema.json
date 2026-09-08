@@ -1,0 +1,238 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/SanderDelden/json/refs/heads/main/schemas/device.schema.json",
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "const": "https://raw.githubusercontent.com/SanderDelden/json/refs/heads/main/schemas/device.schema.json"
+        },
+        "id": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "hostname": {
+            "type": "string",
+            "format": "hostname",
+            "pattern": "^[a-z0-9-]+$",
+            "minLength": 3,
+            "maxLength": 63
+        },
+        "mgmt_ip": {
+            "type": "string",
+            "format": "ipv4"
+        },
+        "loopback": {
+            "type": "string",
+            "format": "ipv6"
+        },
+        "backup_mgmt_ip": {
+            "type": "string",
+            "anyOf": [
+                { "format": "ipv4" },
+                { "format": "ipv6" }
+            ]
+        },
+        "vendor": {
+            "type": "string",
+            "enum": [
+                "Arista",
+                "Cisco",
+                "Huawei",
+                "Nokia"
+            ]
+        },
+        "model": {
+            "type": "string"
+        },
+        "role": {
+            "type": "string",
+            "enum": [
+                "router",
+                "switch",
+                "firewall"
+            ]
+        },
+        "serial_number": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{8,20}$"
+        },
+        "installed_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "maintenance_day": {
+            "type": "string",
+            "format": "date"
+        },
+        "contact_email": {
+            "type": "string",
+            "format": "email"
+        },
+        "docs_url": {
+            "type": "string",
+            "format": "uri"
+        },
+        "description": {
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "bgp_asn": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+        },
+        "ios_version": {
+            "type": "string"
+        },
+        "eos_version": {
+            "type": "string"
+        },
+        "vrp_version": {
+            "type": "string"
+        },
+        "sros_version": {
+            "type": "string"
+        },
+        "mtu": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "multipleOf": 2
+        },
+        "vlan_ids": {
+            "type": "array",
+            "items": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4094
+            },
+            "uniqueItems": true,
+            "maxItems": 4094,
+            "contains": {
+                "const": 1
+            }
+        },
+        "coordinates": {
+            "type": "array",
+            "prefixItems": [
+                { "type": "number" },
+                { "type": "number" }
+            ]
+        },
+        "interfaces": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/interface"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        }
+    },
+    "patternProperties": {
+        "^custom_": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "hostname",
+        "mgmt_ip",
+        "vendor",
+        "model",
+        "role",
+        "interfaces"
+    ],
+    "additionalProperties": false,
+    "minProperties": 1,
+    "maxProperties": 30,
+    "$defs": {
+        "interface": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z]+[0-9]+(/[0-9]+)*$"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "description": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "mtu": {
+                    "type": "integer",
+                    "minimum": 64,
+                    "maximum": 9216,
+                    "multipleOf": 2
+                },
+                "speed": {
+                    "type": "string",
+                    "enum": [
+                        "10M",
+                        "100M",
+                        "1G",
+                        "10G",
+                        "25G",
+                        "40G",
+                        "100G"
+                    ]
+                },
+                "vlan_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4094
+                    },
+                    "uniqueItems": true,
+                    "maxItems": 4094
+                }
+            },
+            "required": [
+                "name",
+                "enabled"
+            ],
+            "additionalProperties": false
+        },
+        "vendor_version": {
+            "oneOf": [
+                {
+                    "properties": { "vendor": { "const": "Cisco" } },
+                    "required": ["vendor", "ios_version"]
+                },
+                {
+                    "properties": { "vendor": { "const": "Arista" } },
+                    "required": ["vendor", "eos_version"]
+                },
+                {
+                    "properties": { "vendor": { "const": "Huawei" } },
+                    "required": ["vendor", "vrp_version"]
+                },
+                {
+                    "properties": { "vendor": { "const": "Nokia" } },
+                    "required": ["vendor", "sros_version"]
+                }
+            ]
+        },
+        "router_bgp": {
+            "if": {
+                "properties": { "role": { "const": "router" } },
+                "required": ["role"]
+            },
+            "then": {
+                "required": ["bgp_asn"]
+            },
+            "else": {
+                "not": { "required": ["bgp_asn"] }
+            }
+        }
+    },
+    "allOf": [
+        { "$ref": "#/$defs/vendor_version" },
+        { "$ref": "#/$defs/router_bgp" }
+    ]
+}

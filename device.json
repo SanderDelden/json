@@ -1,0 +1,39 @@
+{
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "hostname": "lab-rtr01",
+    "mgmt_ip": "192.168.1.1",
+    "loopback": "2001:db8::1",
+    "backup_mgmt_ip": "192.168.2.1",
+    "vendor": "Arista",
+    "model": "XYZ123",
+    "role": "router",
+    "serial_number": "ABC1234567",
+    "installed_at": "2024-01-15T09:30:00Z",
+    "maintenance_day": "2024-02-01",
+    "contact_email": "netops@example.com",
+    "docs_url": "https://wiki.example.com/devices/lab-rtr01",
+    "description": null,
+    "bgp_asn": 65001,
+    "eos_version": "4.36.1F",
+    "mtu": 9216,
+    "vlan_ids": [1, 10, 20],
+    "coordinates": [52.3676, 4.9041],
+    "custom_site_code": "AMS1",
+    "interfaces": [
+        {
+            "name": "Ethernet1",
+            "enabled": true,
+            "description": "Uplink to core",
+            "mtu": 9214,
+            "speed": "10G",
+            "vlan_ids": [10, 20]
+        },
+        {
+            "name": "Management1",
+            "enabled": true,
+            "description": null,
+            "mtu": 1500,
+            "speed": "1G"
+        }
+    ]
+}
